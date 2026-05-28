@@ -16,9 +16,9 @@ Priorities:
 1. Working end-to-end RAG flow
 2. Clean architecture
 3. Measurement:
-    - Recall@k
-    - latency
-    - estimated cost
+   - Recall@k
+   - latency
+   - estimated cost
 4. Simplicity over abstraction
 
 ---
@@ -152,9 +152,10 @@ Never introduce more than ONE unfamiliar layer simultaneously.
 Bad:
 
 Next.js
-+ embeddings
-+ AI SDK
-+ streaming
+
+- embeddings
+- AI SDK
+- streaming
   same session
 
 Good:
@@ -192,5 +193,5 @@ Mention what should remain simple and NOT be abstracted.
 Prefer:
 
 simple solution
->
-future-proof abstraction
+
+> future-proof abstraction

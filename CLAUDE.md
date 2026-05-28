@@ -26,11 +26,13 @@ There is no test runner wired up yet. `AGENTS.md` names Vitest as the intended f
 This repo is currently a fresh `create-next-app` scaffold plus shadcn/ui — the RAG application described in `AGENTS.md` / `SPEC.md` is **not built yet**. Before assuming a module exists, check: most of the documented architecture is still aspirational.
 
 What exists today:
+
 - `app/` — default scaffold (`layout.tsx`, `page.tsx` still shows the Next.js starter page; metadata still says "Create Next App").
 - `components/ui/` — shadcn primitives (button, card, alert, input, textarea).
 - `lib/utils.ts` — only the `cn()` class-merge helper.
 
 What does NOT exist yet (build per the user-flow order in `SPEC.md`: upload → chunking → embeddings → retrieval → streaming → eval → persistence):
+
 - No `VectorStore` interface, `MemoryStore`, or `PgVectorStore`.
 - No embedding / chunking / retrieval modules in `lib/`.
 - No `/eval` page, route handlers, or server actions.

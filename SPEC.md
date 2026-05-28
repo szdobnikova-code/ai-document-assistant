@@ -266,7 +266,6 @@ Avg latency: 1.2s
 
 Avg cost/query: $0.0008
 
-
 These matter more than another UI feature.
 
 ---

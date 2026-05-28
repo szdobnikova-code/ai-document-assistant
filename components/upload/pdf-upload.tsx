@@ -27,7 +27,7 @@ export function PdfUpload() {
           name="file"
           accept="application/pdf"
           required
-          className="block w-full text-sm text-muted-foreground file:mr-3 file:rounded-lg file:border file:border-input file:bg-background file:px-3 file:py-1.5 file:text-sm file:font-medium hover:file:bg-muted"
+          className="text-muted-foreground file:border-input file:bg-background hover:file:bg-muted block w-full text-sm file:mr-3 file:rounded-lg file:border file:px-3 file:py-1.5 file:text-sm file:font-medium"
         />
         <Button type="submit" disabled={pending}>
           <FileUp />
@@ -52,7 +52,17 @@ export function PdfUpload() {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <pre className="max-h-80 overflow-auto rounded-lg bg-muted p-3 text-xs whitespace-pre-wrap">
+            <p className="text-muted-foreground mb-3 text-sm">
+              {state.chunkStats.chunksCount} chunks · avg{' '}
+              {state.chunkStats.avgTokens} tokens · max{' '}
+              {state.chunkStats.maxTokens} tokens
+            </p>
+            <p className="text-muted-foreground mb-3 text-sm">
+              {state.embeddingStats
+                ? `${state.embeddingStats.embeddedChunksCount} chunks embedded · ${state.embeddingStats.embeddingDimensions} dimensions`
+                : 'Embeddings unavailable'}
+            </p>
+            <pre className="bg-muted max-h-80 overflow-auto rounded-lg p-3 text-xs whitespace-pre-wrap">
               {state.document.text}
             </pre>
           </CardContent>

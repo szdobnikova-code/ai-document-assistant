@@ -21,7 +21,6 @@ Read project requirements in:
 
 SPEC.md
 
-
 ---
 
 ## Stack
@@ -51,7 +50,6 @@ Testing:
 
 - Vitest
 
-
 ---
 
 ## Documentation rules
@@ -71,7 +69,6 @@ Use Context7 MCP before implementation for:
 Do not rely purely on model memory.
 
 Never invent APIs.
-
 
 ---
 
@@ -103,7 +100,6 @@ Never call OpenAI from client components.
 
 Never expose API keys.
 
-
 ---
 
 ## Retrieval rules
@@ -130,7 +126,6 @@ VectorStore must NOT know:
 
 Store accepts ready embeddings only.
 
-
 ---
 
 ## Chunking rules
@@ -148,7 +143,6 @@ Chunking:
 - overlap required
 - avoid broken boundaries
 - optimize retrieval quality
-
 
 ---
 
@@ -170,7 +164,6 @@ Do NOT implement:
 - LLM-as-judge
 - answer correctness via another model
 
-
 ---
 
 ## Development rule (critical)
@@ -180,9 +173,10 @@ Never introduce more than ONE unfamiliar layer at once.
 Bad:
 
 Next.js
-+ AI SDK
-+ streaming
-+ embeddings
+
+- AI SDK
+- streaming
+- embeddings
   same session
 
 Good:
@@ -191,7 +185,6 @@ upload works
 → embeddings work
 → retrieval works
 → streaming works
-
 
 ---
 
@@ -209,7 +202,6 @@ Do NOT add unless explicitly requested:
 - background jobs
 
 Simple > enterprise.
-
 
 ---
 
