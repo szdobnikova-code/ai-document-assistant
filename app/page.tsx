@@ -1,6 +1,7 @@
 import { FileUp } from 'lucide-react';
 
 import { PdfUpload } from '@/components/upload/pdf-upload';
+import { QuestionForm } from '@/components/question/question-form';
 
 export default function HomePage() {
   return (
@@ -20,6 +21,10 @@ export default function HomePage() {
 
         <div className="mt-6 w-full">
           <PdfUpload />
+        </div>
+
+        <div className="mt-6 w-full">
+          <QuestionForm />
         </div>
       </section>
     </main>

@@ -13,13 +13,13 @@ Whenever making architectural decisions — including introducing abstractions, 
 ## Commands
 
 ```bash
-npm run dev       # start dev server at http://localhost:3000
-npm run build     # production build
-npm run start     # serve the production build
-npm run lint      # eslint (eslint-config-next: core-web-vitals + typescript)
-npm run test      # vitest (watch mode)
-npm run test:run  # vitest run (single pass — use in CI / verification)
-npm run format    # prettier . --write   (format:check for a dry run)
+npm run dev         # start dev server at http://localhost:3000
+npm run build       # production build
+npm run start       # serve the production build
+npm run lint        # eslint (eslint-config-next: core-web-vitals + typescript)
+npm run test        # vitest run (single pass — use in CI / verification)
+npm run test:watch  # vitest (watch mode)
+npm run format      # prettier . --write   (format:check for a dry run)
 ```
 
 Vitest is installed and wired up: `vitest.config.ts` sets `environment: 'node'` and the `@` → repo-root alias, and tests live under `tests/` mirroring the `lib/` layout (e.g. `tests/chunk/chunk-text.test.tsx`, `tests/retrieval/cosine-similarity.test.ts`).
@@ -38,7 +38,18 @@ What exists today:
 
 What does NOT exist yet (remaining `SPEC.md` order: retrieval → streaming → eval → persistence):
 
-- `MemoryStore.search` is still a throwing stub — retrieval is not wired (`cosineSimilarity` is the building block for it).
+Retrieval is implemented.
+
+Current working flow:
+PDF upload → text extraction → chunking → embeddings → MemoryStore → semantic search → answer generation.
+
+Still missing:
+
+- citations
+- streaming
+- chat history
+- persistence / PgVectorStore
+- evaluation page
 - No `PgVectorStore` (only the in-memory `MemoryStore`).
 - No `/eval` page, no route handlers, no chat/streaming UI.
 - Vercel AI SDK is **not installed** despite being listed in the stack — install it when reaching the streaming step.
