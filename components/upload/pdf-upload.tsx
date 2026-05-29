@@ -13,7 +13,6 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { ChunkSearch } from '../search/chunk-search';
 
 const initialState: UploadState = { status: 'idle' };
 
@@ -69,9 +68,6 @@ export function PdfUpload() {
               </pre>
             </CardContent>
           </Card>
-          <div className="mt-6">
-            <ChunkSearch key={state.document.meta.id} />
-          </div>
         </>
       )}
     </div>

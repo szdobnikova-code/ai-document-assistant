@@ -1,6 +1,6 @@
 'use server';
 
-import { generateAnswer } from '@/lib/ai/generate-answer';
+import { AnswerSource, generateAnswer } from '@/lib/ai/generate-answer';
 import { retrieveChunks } from '@/lib/retrieval/retrieve-chunks';
 
 const TOP_K = 3;
@@ -8,7 +8,12 @@ const MAX_QUESTION_LENGTH = 1000;
 
 export type AnswerState =
   | { status: 'idle' }
-  | { status: 'success'; question: string; answer: string }
+  | {
+      status: 'success';
+      question: string;
+      answer: string;
+      sources: AnswerSource[];
+    }
   | { status: 'error'; message: string };
 
 export async function askQuestion(
@@ -30,18 +35,28 @@ export async function askQuestion(
   try {
     const scored = await retrieveChunks(q, TOP_K);
     if (scored.length === 0) {
-      // No stored chunks — skip the LLM call (cost guard).
       return {
         status: 'success',
         question: q,
         answer: 'No document content is available — upload a PDF first.',
+        sources: [],
       };
     }
 
-    // Pass only the chunk text to generation; never leak embeddings/metadata.
-    const context = scored.map(({ chunk }) => chunk.text);
-    const answer = await generateAnswer(q, context);
-    return { status: 'success', question: q, answer };
+    const sources: AnswerSource[] = scored.map(({ chunk, score }) => ({
+      id: chunk.id,
+      text: chunk.text,
+      filename: chunk.meta.filename,
+      index: chunk.meta.index,
+      score,
+    }));
+    const answer = await generateAnswer(q, sources);
+    return {
+      status: 'success',
+      question: q,
+      answer,
+      sources,
+    };
   } catch (err) {
     // Log raw error server-side only; never surface it to the UI.
     console.error('Answer generation failed:', err);

@@ -12,6 +12,9 @@ import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 export function QuestionForm() {
   const [state, setState] = useState<AnswerState>({ status: 'idle' });
   const [pending, startTransition] = useTransition();
+  const showSources =
+    state.status === 'success' &&
+    state.answer !== "I couldn't find that in the document.";
 
   function onSubmit(formData: FormData) {
     startTransition(async () => setState(await askQuestion(formData)));
@@ -39,13 +42,38 @@ export function QuestionForm() {
       )}
 
       {state.status === 'success' && (
-        <Card>
-          <CardContent>
-            <p className="text-left text-sm whitespace-pre-wrap">
-              {state.answer}
-            </p>
-          </CardContent>
-        </Card>
+        <div className="flex flex-col gap-4">
+          <Card>
+            <CardContent>
+              <p className="text-left text-sm whitespace-pre-wrap">
+                {state.answer}
+              </p>
+            </CardContent>
+          </Card>
+
+          {showSources && state.sources.length > 0 && (
+            <div className="flex flex-col gap-3 text-left">
+              <h3 className="text-sm font-medium">Sources</h3>
+
+              {state.sources.map((source, index) => (
+                <Card key={source.id}>
+                  <CardContent>
+                    <div className="text-muted-foreground mb-2 flex justify-between text-xs">
+                      <span>
+                        [{index + 1}] {source.filename} · chunk {source.index}
+                      </span>
+                      <span>score {source.score.toFixed(3)}</span>
+                    </div>
+
+                    <p className="line-clamp-4 text-sm whitespace-pre-wrap">
+                      {source.text}
+                    </p>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          )}
+        </div>
       )}
     </div>
   );
