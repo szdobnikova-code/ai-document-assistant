@@ -84,6 +84,7 @@ export async function uploadDocument(
           },
         })),
       );
+      await memoryStore.reset();
       await memoryStore.add(stored);
       const dims = stored[0]?.embedding?.length ?? 0;
       if (stored.length > 0 && dims > 0) {

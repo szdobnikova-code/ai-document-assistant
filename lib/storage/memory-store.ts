@@ -5,6 +5,7 @@ import type {
   SearchParams,
   ChunkMeta,
 } from '@/types/document';
+import { cosineSimilarity } from '@/lib/retrieval/cosine-similarity';
 
 export class MemoryStore<T = ChunkMeta> implements VectorStore<T> {
   private items: StoredChunk<T>[] = [];
@@ -13,11 +14,23 @@ export class MemoryStore<T = ChunkMeta> implements VectorStore<T> {
     this.items.push(...items);
   }
 
-  // Cosine-similarity retrieval is a later step (SPEC "Retrieval"). Fail loud
-  // so nothing silently depends on it before it's implemented.
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  async search(_params: SearchParams): Promise<Scored<T>[]> {
-    throw new Error('MemoryStore.search not implemented yet (retrieval step)');
+  async search(params: SearchParams): Promise<Scored<T>[]> {
+    const { embedding, topK } = params;
+    if (topK <= 0) {
+      throw new Error('MemoryStore.search: topK must be > 0');
+    }
+
+    const scored: Scored<T>[] = [];
+    for (const chunk of this.items) {
+      if (!chunk.embedding) continue;
+      scored.push({
+        chunk,
+        score: cosineSimilarity(embedding, chunk.embedding),
+      });
+    }
+
+    scored.sort((a, b) => b.score - a.score);
+    return scored.slice(0, topK);
   }
 
   async reset(): Promise<void> {

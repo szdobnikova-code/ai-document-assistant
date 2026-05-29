@@ -13,30 +13,35 @@ Whenever making architectural decisions — including introducing abstractions, 
 ## Commands
 
 ```bash
-npm run dev     # start dev server at http://localhost:3000
-npm run build   # production build
-npm run start   # serve the production build
-npm run lint    # eslint (eslint-config-next: core-web-vitals + typescript)
+npm run dev       # start dev server at http://localhost:3000
+npm run build     # production build
+npm run start     # serve the production build
+npm run lint      # eslint (eslint-config-next: core-web-vitals + typescript)
+npm run test      # vitest (watch mode)
+npm run test:run  # vitest run (single pass — use in CI / verification)
+npm run format    # prettier . --write   (format:check for a dry run)
 ```
 
-There is no test runner wired up yet. `AGENTS.md` names Vitest as the intended framework, but it is not installed and there is no `test` script — add both when writing the first test.
+Vitest is installed and wired up: `vitest.config.ts` sets `environment: 'node'` and the `@` → repo-root alias, and tests live under `tests/` mirroring the `lib/` layout (e.g. `tests/chunk/chunk-text.test.tsx`, `tests/retrieval/cosine-similarity.test.ts`).
 
 ## Current state vs. target
 
-This repo is currently a fresh `create-next-app` scaffold plus shadcn/ui — the RAG application described in `AGENTS.md` / `SPEC.md` is **not built yet**. Before assuming a module exists, check: most of the documented architecture is still aspirational.
+The pipeline is partway built (upload → chunking → embeddings done; retrieval in progress). The later stages in `SPEC.md` are still aspirational, so before assuming a module exists, check.
 
 What exists today:
 
-- `app/` — default scaffold (`layout.tsx`, `page.tsx` still shows the Next.js starter page; metadata still says "Create Next App").
-- `components/ui/` — shadcn primitives (button, card, alert, input, textarea).
-- `lib/utils.ts` — only the `cn()` class-merge helper.
+- `app/page.tsx` — real upload UI (renders `components/upload/PdfUpload`), no longer the starter page. `app/actions/upload.ts` is the upload server action. (Note: `layout.tsx` metadata still says "Create Next App" — not yet updated.)
+- `components/ui/` — shadcn primitives; `components/upload/` — the `PdfUpload` client component.
+- `lib/` — `pdf/extract.ts` (PDF text extraction via `unpdf`), `chunk/chunk-text.tsx`, `embeddings/embed-text.ts`, `storage/` (`vector-store.ts` interface, `memory-store.ts`, and the `store.ts` singleton), `retrieval/cosine-similarity.ts`, and `utils.ts` (`cn()`).
+- `types/document.ts` — `StoredChunk`, `Scored`, `SearchParams`, `ChunkMeta`.
+- Installed AI/tokenizer deps: `openai`, `gpt-tokenizer`, `unpdf`.
 
-What does NOT exist yet (build per the user-flow order in `SPEC.md`: upload → chunking → embeddings → retrieval → streaming → eval → persistence):
+What does NOT exist yet (remaining `SPEC.md` order: retrieval → streaming → eval → persistence):
 
-- No `VectorStore` interface, `MemoryStore`, or `PgVectorStore`.
-- No embedding / chunking / retrieval modules in `lib/`.
-- No `/eval` page, route handlers, or server actions.
-- AI/tokenizer deps (Vercel AI SDK, OpenAI SDK, `gpt-tokenizer`) are **not installed** despite being listed in the stack — install them when reaching that step.
+- `MemoryStore.search` is still a throwing stub — retrieval is not wired (`cosineSimilarity` is the building block for it).
+- No `PgVectorStore` (only the in-memory `MemoryStore`).
+- No `/eval` page, no route handlers, no chat/streaming UI.
+- Vercel AI SDK is **not installed** despite being listed in the stack — install it when reaching the streaming step.
 
 ## Worth knowing
 
