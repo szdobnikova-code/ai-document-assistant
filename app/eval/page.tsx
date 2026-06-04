@@ -1,4 +1,4 @@
-import { QuestionForm } from '@/components/question/question-form';
+import { StreamingQuestionForm } from '@/components/question/streaming-question-form';
 
 export default function EvalPage() {
   return (
@@ -12,7 +12,7 @@ export default function EvalPage() {
         </p>
 
         <div className="mt-8">
-          <QuestionForm />
+          <StreamingQuestionForm />
         </div>
       </section>
     </main>
