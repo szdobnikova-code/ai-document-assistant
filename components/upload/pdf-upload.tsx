@@ -1,6 +1,6 @@
 'use client';
 
-import { useActionState } from 'react';
+import { useActionState, useEffect, useState } from 'react';
 import { FileUp } from 'lucide-react';
 
 import { uploadDocument, type UploadState } from '@/app/actions/upload';
@@ -15,9 +15,38 @@ import {
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 
 const initialState: UploadState = { status: 'idle' };
+const STORAGE_KEY = 'ai-document-assistant:upload-state';
+
+function readStoredState(): UploadState {
+  if (typeof window === 'undefined') {
+    return initialState;
+  }
+
+  const stored = window.sessionStorage.getItem(STORAGE_KEY);
+
+  if (!stored) {
+    return initialState;
+  }
+
+  try {
+    return JSON.parse(stored) as UploadState;
+  } catch {
+    window.sessionStorage.removeItem(STORAGE_KEY);
+    return initialState;
+  }
+}
 
 export function PdfUpload() {
   const [state, action, pending] = useActionState(uploadDocument, initialState);
+  const [storedState] = useState<UploadState>(() => readStoredState());
+
+  const displayState = state.status === 'idle' ? storedState : state;
+
+  useEffect(() => {
+    if (state.status === 'success') {
+      window.sessionStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    }
+  }, [state]);
 
   return (
     <div className="flex w-full flex-col gap-4">
@@ -35,36 +64,37 @@ export function PdfUpload() {
         </Button>
       </form>
 
-      {state.status === 'error' && (
+      {displayState.status === 'error' && (
         <Alert variant="destructive">
           <AlertTitle>Couldn’t extract text</AlertTitle>
-          <AlertDescription>{state.message}</AlertDescription>
+          <AlertDescription>{displayState.message}</AlertDescription>
         </Alert>
       )}
 
-      {state.status === 'success' && (
+      {displayState.status === 'success' && (
         <>
           <Card className="text-left">
             <CardHeader>
-              <CardTitle>{state.document.meta.filename}</CardTitle>
+              <CardTitle>{displayState.document.meta.filename}</CardTitle>
               <CardDescription>
-                {state.document.meta.pageCount} pages ·{' '}
-                {state.document.meta.charCount.toLocaleString()} characters
+                {displayState.document.meta.pageCount} pages ·{' '}
+                {displayState.document.meta.charCount.toLocaleString()}{' '}
+                characters
               </CardDescription>
             </CardHeader>
             <CardContent>
               <p className="text-muted-foreground mb-3 text-sm">
-                {state.chunkStats.chunksCount} chunks · avg{' '}
-                {state.chunkStats.avgTokens} tokens · max{' '}
-                {state.chunkStats.maxTokens} tokens
+                {displayState.chunkStats.chunksCount} chunks · avg{' '}
+                {displayState.chunkStats.avgTokens} tokens · max{' '}
+                {displayState.chunkStats.maxTokens} tokens
               </p>
               <p className="text-muted-foreground mb-3 text-sm">
-                {state.embeddingStats
-                  ? `${state.embeddingStats.embeddedChunksCount} chunks embedded · ${state.embeddingStats.embeddingDimensions} dimensions`
+                {displayState.embeddingStats
+                  ? `${displayState.embeddingStats.embeddedChunksCount} chunks embedded · ${displayState.embeddingStats.embeddingDimensions} dimensions`
                   : 'Embeddings unavailable'}
               </p>
               <pre className="bg-muted max-h-80 overflow-auto rounded-lg p-3 text-xs whitespace-pre-wrap">
-                {state.document.text}
+                {displayState.document.text}
               </pre>
             </CardContent>
           </Card>

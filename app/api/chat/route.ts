@@ -1,6 +1,11 @@
 import { retrieveChunks } from '@/lib/retrieval/retrieve-chunks';
-import { streamText } from 'ai';
+import {
+  createUIMessageStream,
+  createUIMessageStreamResponse,
+  streamText,
+} from 'ai';
 import { openai } from '@ai-sdk/openai';
+import type { ChatUIMessage, ChunkSource } from '@/types/chat';
 
 const GENERATION_MODEL = 'gpt-4o-mini';
 const TOP_K = 3;
@@ -83,26 +88,53 @@ export async function POST(request: Request) {
 
   const scored = await retrieveChunks(question, TOP_K);
 
-  if (scored.length === 0) {
-    const result = streamText({
-      model: openai(GENERATION_MODEL),
-      prompt: 'No document content is available — upload a PDF first.',
-    });
+  const stream = createUIMessageStream<ChatUIMessage>({
+    execute: async ({ writer }) => {
+      if (scored.length === 0) {
+        const result = streamText({
+          model: openai(GENERATION_MODEL),
+          prompt: 'No document content is available — upload a PDF first.',
+        });
+        writer.merge(result.toUIMessageStream());
+        return;
+      }
 
-    return result.toUIMessageStreamResponse();
-  }
+      const sources: ChunkSource[] = scored.map(({ chunk, score }) => ({
+        id: chunk.id,
+        text: chunk.text,
+        filename: chunk.meta.filename,
+        index: chunk.meta.index,
+        score,
+      }));
 
-  const passages = scored
-    .map(({ chunk }, index) => `[${index + 1}] ${chunk.text}`)
-    .join('\n\n');
+      // writer.write({
+      //   type: 'data-sources',
+      //   id: 'sources',
+      //   data: sources,
+      // });
 
-  const result = streamText({
-    model: openai(GENERATION_MODEL),
-    system: SYSTEM_PROMPT,
-    prompt: `Context passages:\n\n${passages}\n\nQuestion: ${question}`,
-    temperature: 0.2,
-    maxOutputTokens: 500,
+      const passages = scored
+        .map(({ chunk }, index) => `[${index + 1}] ${chunk.text}`)
+        .join('\n\n');
+
+      const result = streamText({
+        model: openai(GENERATION_MODEL),
+        system: SYSTEM_PROMPT,
+        prompt: `Context passages:\n\n${passages}\n\nQuestion: ${question}`,
+        temperature: 0.2,
+        maxOutputTokens: 500,
+        onFinish: () => {
+          writer.write({
+            type: 'data-sources',
+            id: 'sources',
+            data: sources,
+          });
+        },
+      });
+
+      writer.merge(result.toUIMessageStream());
+    },
   });
 
-  return result.toUIMessageStreamResponse();
+  return createUIMessageStreamResponse({ stream });
 }
