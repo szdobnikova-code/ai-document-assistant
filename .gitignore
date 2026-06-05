@@ -43,3 +43,6 @@ next-env.d.ts
 
 # Personal prompt history scratch
 docs/promts-raw.txt
+
+# playwright MCP session artifacts
+/.playwright-mcp/

@@ -1,9 +1,16 @@
 'use client';
 
-import { useActionState, useEffect, useSyncExternalStore } from 'react';
+import {
+  useActionState,
+  useEffect,
+  useState,
+  useSyncExternalStore,
+  type FormEvent,
+} from 'react';
 import { FileUp } from 'lucide-react';
 
 import { uploadDocument, type UploadState } from '@/app/actions/upload';
+import { useClearDocumentChat } from '@/components/chat/chat-provider';
 import { Button } from '@/components/ui/button';
 import {
   Card,
@@ -13,6 +20,16 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 
 const initialState: UploadState = { status: 'idle' };
 const STORAGE_KEY = 'ai-document-assistant:upload-state';
@@ -65,18 +82,46 @@ export function PdfUpload() {
     getStoredSnapshot,
     getServerSnapshot,
   );
+  const clearChat = useClearDocumentChat();
 
   const displayState = state.status === 'idle' ? storedState : state;
+  const hasExistingDocument = displayState.status === 'success';
+
+  const [pendingFormData, setPendingFormData] = useState<FormData | null>(null);
+  const pendingFilename =
+    (pendingFormData?.get('file') as File | null)?.name ?? null;
 
   useEffect(() => {
     if (state.status === 'success') {
       window.sessionStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+      clearChat();
     }
-  }, [state]);
+  }, [state, clearChat]);
+
+  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
+    if (!hasExistingDocument) return;
+    e.preventDefault();
+    setPendingFormData(new FormData(e.currentTarget));
+  };
+
+  const handleConfirmReplace = () => {
+    if (pendingFormData) {
+      action(pendingFormData);
+      setPendingFormData(null);
+    }
+  };
+
+  const handleDialogOpenChange = (open: boolean) => {
+    if (!open) setPendingFormData(null);
+  };
 
   return (
     <div className="flex w-full flex-col gap-4">
-      <form action={action} className="flex flex-col items-center gap-3">
+      <form
+        action={action}
+        onSubmit={handleSubmit}
+        className="flex flex-col items-center gap-3"
+      >
         <input
           type="file"
           name="file"
@@ -89,6 +134,33 @@ export function PdfUpload() {
           {pending ? 'Extracting…' : 'Extract text'}
         </Button>
       </form>
+
+      <AlertDialog
+        open={pendingFormData !== null}
+        onOpenChange={handleDialogOpenChange}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Replace current document?</AlertDialogTitle>
+            <AlertDialogDescription>
+              {displayState.status === 'success' && (
+                <>
+                  Uploading{' '}
+                  <strong>{pendingFilename ?? 'a new document'}</strong> will
+                  replace <strong>{displayState.document.meta.filename}</strong>{' '}
+                  and clear the current chat.
+                </>
+              )}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleConfirmReplace}>
+              Replace
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
 
       {displayState.status === 'error' && (
         <Alert variant="destructive">
