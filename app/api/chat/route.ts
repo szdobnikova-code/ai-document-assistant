@@ -6,6 +6,7 @@ import {
 } from 'ai';
 import { openai } from '@ai-sdk/openai';
 import type { ChatUIMessage, ChunkSource } from '@/types/chat';
+import { usageTracker } from '@/lib/usage/tracker';
 
 const GENERATION_MODEL = 'gpt-4o-mini';
 const TOP_K = 3;
@@ -94,6 +95,14 @@ export async function POST(request: Request) {
         const result = streamText({
           model: openai(GENERATION_MODEL),
           prompt: 'No document content is available — upload a PDF first.',
+          onFinish: ({ usage }) => {
+            usageTracker.record(
+              'generation',
+              GENERATION_MODEL,
+              usage.inputTokens ?? 0,
+              usage.outputTokens ?? 0,
+            );
+          },
         });
         writer.merge(result.toUIMessageStream());
         return;
@@ -107,12 +116,6 @@ export async function POST(request: Request) {
         score,
       }));
 
-      // writer.write({
-      //   type: 'data-sources',
-      //   id: 'sources',
-      //   data: sources,
-      // });
-
       const passages = scored
         .map(({ chunk }, index) => `[${index + 1}] ${chunk.text}`)
         .join('\n\n');
@@ -123,7 +126,13 @@ export async function POST(request: Request) {
         prompt: `Context passages:\n\n${passages}\n\nQuestion: ${question}`,
         temperature: 0.2,
         maxOutputTokens: 500,
-        onFinish: () => {
+        onFinish: ({ usage }) => {
+          usageTracker.record(
+            'generation',
+            GENERATION_MODEL,
+            usage.inputTokens ?? 0,
+            usage.outputTokens ?? 0,
+          );
           writer.write({
             type: 'data-sources',
             id: 'sources',
