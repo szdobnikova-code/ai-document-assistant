@@ -1,6 +1,10 @@
 import { MemoryStore } from './memory-store';
 import type { ChunkMeta } from '@/types/document';
+import { VectorStore } from '@/lib/storage/vector-store';
+import { PgVectorStore } from '@/lib/storage/pg-vector-store';
 
-// Single in-memory store for the app. Ephemeral by design: resets on server
-// restart and is per-instance in serverless. Fine for Week 1 (no retrieval yet).
-export const memoryStore = new MemoryStore<ChunkMeta>();
+const usePgVector = process.env.VECTOR_STORE === 'pg';
+
+export const vectorStore: VectorStore<ChunkMeta> = usePgVector
+  ? new PgVectorStore<ChunkMeta>()
+  : new MemoryStore<ChunkMeta>();

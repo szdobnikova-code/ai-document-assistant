@@ -1,4 +1,3 @@
-// Extraction output (Day 2 deliverable)
 export interface DocumentMeta {
   id: string;
   filename: string;
@@ -24,6 +23,7 @@ export interface StoredChunk<T = ChunkMeta> {
   id: string;
   text: string;
   embedding?: number[]; // READY embedding — store never computes this
+  tokenCount?: number;
   meta: T;
 }
 

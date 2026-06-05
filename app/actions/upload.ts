@@ -5,8 +5,9 @@ import { z } from 'zod';
 import { chunkText } from '@/lib/chunk/chunk-text';
 import { embedText } from '@/lib/embeddings/embed-text';
 import { extractPdfText } from '@/lib/pdf/extract';
-import { memoryStore } from '@/lib/storage/store';
+import { vectorStore } from '@/lib/storage/store';
 import type { ExtractedDocument, StoredChunk } from '@/types/document';
+import { upsertDocument } from '@/lib/storage/document-store';
 
 const fileSchema = z.file().mime('application/pdf');
 
@@ -84,8 +85,9 @@ export async function uploadDocument(
           },
         })),
       );
-      await memoryStore.reset();
-      await memoryStore.add(stored);
+      await vectorStore.reset();
+      await upsertDocument(document.meta);
+      await vectorStore.add(stored);
       const dims = stored[0]?.embedding?.length ?? 0;
       if (stored.length > 0 && dims > 0) {
         embeddingStats = {

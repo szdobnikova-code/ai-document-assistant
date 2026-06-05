@@ -1,7 +1,7 @@
 import 'server-only';
 
 import { embedText } from '@/lib/embeddings/embed-text';
-import { memoryStore } from '@/lib/storage/store';
+import { vectorStore } from '@/lib/storage/store';
 import type { Scored } from '@/types/document';
 
 // Documented retrieval flow: embedText() -> retrieveChunks() -> store.search().
@@ -11,5 +11,5 @@ export async function retrieveChunks(
   topK = 3,
 ): Promise<Scored[]> {
   const embedding = await embedText(query);
-  return memoryStore.search({ embedding, topK });
+  return vectorStore.search({ embedding, topK });
 }
