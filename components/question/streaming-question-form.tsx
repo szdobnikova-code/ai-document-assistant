@@ -1,7 +1,7 @@
 'use client';
 
 import { useChat } from '@ai-sdk/react';
-import React, { useState } from 'react';
+import { useState, type SubmitEvent } from 'react';
 import { Sparkles } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { DefaultChatTransport } from 'ai';
@@ -9,25 +9,25 @@ import { DefaultChatTransport } from 'ai';
 export function StreamingQuestionForm() {
   const [input, setInput] = useState('');
   const { messages, sendMessage, status, error } = useChat({
-    transport: new DefaultChatTransport({ api: 'api/chat' }),
+    transport: new DefaultChatTransport({ api: '/api/chat' }),
   });
 
   const isLoading = status === 'submitted' || status === 'streaming';
 
-  const handleSubmit = async (e: React.SubmitEvent<HTMLFormElement>) => {
+  const handleSubmit = (e: SubmitEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     const text = input.trim();
     if (!text || isLoading) return;
 
-    await sendMessage({ text });
+    void sendMessage({ text });
     setInput('');
   };
 
   return (
     <div className={'flex w-full flex-col gap-4'}>
       <form
-        onSubmit={(e) => handleSubmit(e)}
+        onSubmit={handleSubmit}
         className={'flex w-full flex-col gap-2'}
       >
         <textarea
