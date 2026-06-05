@@ -1,6 +1,6 @@
 'use client';
 
-import { useActionState, useEffect, useState } from 'react';
+import { useActionState, useEffect, useSyncExternalStore } from 'react';
 import { FileUp } from 'lucide-react';
 
 import { uploadDocument, type UploadState } from '@/app/actions/upload';
@@ -17,28 +17,54 @@ import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 const initialState: UploadState = { status: 'idle' };
 const STORAGE_KEY = 'ai-document-assistant:upload-state';
 
-function readStoredState(): UploadState {
+let cachedRaw: string | null = null;
+let cachedValue: UploadState = initialState;
+
+function getStoredSnapshot(): UploadState {
   if (typeof window === 'undefined') {
     return initialState;
   }
 
-  const stored = window.sessionStorage.getItem(STORAGE_KEY);
+  const raw = window.sessionStorage.getItem(STORAGE_KEY);
 
-  if (!stored) {
-    return initialState;
+  if (raw === cachedRaw) {
+    return cachedValue;
+  }
+
+  cachedRaw = raw;
+
+  if (!raw) {
+    cachedValue = initialState;
+    return cachedValue;
   }
 
   try {
-    return JSON.parse(stored) as UploadState;
+    cachedValue = JSON.parse(raw) as UploadState;
   } catch {
     window.sessionStorage.removeItem(STORAGE_KEY);
-    return initialState;
+    cachedRaw = null;
+    cachedValue = initialState;
   }
+
+  return cachedValue;
+}
+
+function getServerSnapshot(): UploadState {
+  return initialState;
+}
+
+function subscribeToStoredState(callback: () => void): () => void {
+  window.addEventListener('storage', callback);
+  return () => window.removeEventListener('storage', callback);
 }
 
 export function PdfUpload() {
   const [state, action, pending] = useActionState(uploadDocument, initialState);
-  const [storedState] = useState<UploadState>(() => readStoredState());
+  const storedState = useSyncExternalStore(
+    subscribeToStoredState,
+    getStoredSnapshot,
+    getServerSnapshot,
+  );
 
   const displayState = state.status === 'idle' ? storedState : state;
 
