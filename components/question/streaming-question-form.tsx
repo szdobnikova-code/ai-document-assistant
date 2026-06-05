@@ -4,15 +4,16 @@ import { useChat } from '@ai-sdk/react';
 import { useState, type SubmitEvent } from 'react';
 import { Sparkles } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
-import { DefaultChatTransport } from 'ai';
+import { useDocumentChat } from '@/components/chat/chat-provider';
 import type { ChatUIMessage, ChunkSource } from '@/types/chat';
 
 const NOT_FOUND_SENTINEL = "I couldn't find that in the document.";
 
 export function StreamingQuestionForm() {
   const [input, setInput] = useState('');
+  const chat = useDocumentChat();
   const { messages, sendMessage, status, error } = useChat<ChatUIMessage>({
-    transport: new DefaultChatTransport({ api: '/api/chat' }),
+    chat,
   });
 
   const isLoading = status === 'submitted' || status === 'streaming';

@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { Geist, Geist_Mono } from 'next/font/google';
 import './globals.css';
 import Link from 'next/link';
+import { ChatProvider } from '@/components/chat/chat-provider';
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -30,29 +31,31 @@ export default function RootLayout({
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="flex min-h-full flex-col">
-        <header className="border-b">
-          <nav className="mx-auto flex h-14 max-w-4xl items-center justify-between px-6">
-            <Link href="/" className="font-semibold">
-              AI Document Assistant
-            </Link>
+        <ChatProvider>
+          <header className="border-b">
+            <nav className="mx-auto flex h-14 max-w-4xl items-center justify-between px-6">
+              <Link href="/" className="font-semibold">
+                AI Document Assistant
+              </Link>
 
-            <div className="flex items-center gap-4 text-sm">
-              <Link
-                href="/"
-                className="text-muted-foreground hover:text-foreground"
-              >
-                Upload
-              </Link>
-              <Link
-                href="/eval"
-                className="text-muted-foreground hover:text-foreground"
-              >
-                Eval
-              </Link>
-            </div>
-          </nav>
-        </header>
-        {children}
+              <div className="flex items-center gap-4 text-sm">
+                <Link
+                  href="/"
+                  className="text-muted-foreground hover:text-foreground"
+                >
+                  Upload
+                </Link>
+                <Link
+                  href="/eval"
+                  className="text-muted-foreground hover:text-foreground"
+                >
+                  Eval
+                </Link>
+              </div>
+            </nav>
+          </header>
+          {children}
+        </ChatProvider>
       </body>
     </html>
   );
