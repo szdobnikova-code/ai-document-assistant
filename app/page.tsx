@@ -1,27 +1,21 @@
-import { FileUp } from 'lucide-react';
-
-import { PdfUpload } from '@/components/upload/pdf-upload';
+import { UploadDropzone } from '@/components/upload/upload-dropzone';
+import { CurrentDocumentCard } from '@/components/upload/current-document-card';
 
 export default function HomePage() {
   return (
-    <main className="flex min-h-[calc(100vh-4rem)] items-center justify-center px-6 py-12">
-      <section className="flex w-full max-w-xl flex-col items-center text-center">
-        <div className="mb-6 rounded-full bg-zinc-100 p-4 dark:bg-zinc-800">
-          <FileUp className="h-10 w-10 text-zinc-500" />
-        </div>
-
-        <h1 className="text-3xl font-semibold tracking-tight">
-          AI Document Assistant
+    <div className="mx-auto flex w-full max-w-3xl flex-col gap-8 px-4 py-8 sm:px-6 sm:py-10">
+      <header className="space-y-1">
+        <h1 className="text-2xl font-semibold tracking-tight">
+          Upload Document
         </h1>
-
-        <p className="mt-3 text-balance text-zinc-600 dark:text-zinc-400">
-          Upload a PDF, ask questions, and get cited answers powered by RAG.
+        <p className="text-muted-foreground text-sm">
+          Upload a PDF document to start asking questions
         </p>
+      </header>
 
-        <div className="mt-6 w-full">
-          <PdfUpload />
-        </div>
-      </section>
-    </main>
+      <UploadDropzone />
+
+      <CurrentDocumentCard withHeading showReplace />
+    </div>
   );
 }

@@ -17,7 +17,7 @@ const SYSTEM_PROMPT = [
   'When using information from a passage, cite it with its passage number like [1] or [2].',
   'Every factual claim should be supported by a citation.',
   'If the answer is not contained in the context, reply exactly: "I couldn\'t find that in the document."',
-  'Answer in plain text, concisely.',
+  'Reply as plain prose only — no markdown, no asterisks, no headings, no bullet lists, no bold or italics. One or two short paragraphs.',
 ].join(' ');
 
 type TextPart = {

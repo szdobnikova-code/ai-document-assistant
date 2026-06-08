@@ -17,6 +17,7 @@ const EMBED_LIMIT = 3;
 
 export interface ChunkStats {
   chunksCount: number;
+  totalTokens: number;
   avgTokens: number;
   maxTokens: number;
 }
@@ -61,11 +62,11 @@ export async function uploadDocument(
     }
     const chunks = chunkText(document.text);
     const tokenCounts = chunks.map((c) => c.tokenCount);
+    const totalTokens = tokenCounts.reduce((sum, n) => sum + n, 0);
     const chunkStats: ChunkStats = {
       chunksCount: chunks.length,
-      avgTokens: Math.round(
-        tokenCounts.reduce((sum, n) => sum + n, 0) / chunks.length,
-      ),
+      totalTokens,
+      avgTokens: Math.round(totalTokens / chunks.length),
       maxTokens: Math.max(...tokenCounts),
     };
 
