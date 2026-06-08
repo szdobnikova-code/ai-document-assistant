@@ -81,6 +81,9 @@
   --sidebar-accent-foreground: oklch(0.491 0.27 292.581);
   --sidebar-border: oklch(0.92 0.004 286.32);
   --sidebar-ring: oklch(0.541 0.281 293.009 / 50%);
+  --font-geist-mono:
+    ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono',
+    'Courier New', monospace;
 }
 
 .dark {
