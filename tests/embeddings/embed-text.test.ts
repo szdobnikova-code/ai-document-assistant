@@ -78,10 +78,7 @@ describe('embedTexts', () => {
 
   it('embeds every input in order and records usage', async () => {
     createMock.mockResolvedValueOnce({
-      data: [
-        { embedding: [0.1, 0.2] },
-        { embedding: [0.3, 0.4] },
-      ],
+      data: [{ embedding: [0.1, 0.2] }, { embedding: [0.3, 0.4] }],
       usage: { prompt_tokens: 12, total_tokens: 12 },
     });
 

@@ -1,0 +1,81 @@
+{
+  "corpus": "tests/fixtures/corpus.pdf",
+  "notes": "Hand-annotated question set for Recall@5 / Recall@10. Each question's expectedChunkIndices points to the canonical discussion chunk in chunks.preview.md (appendix repeats are intentionally ignored to make Recall stricter).",
+  "questions": [
+    {
+      "id": "q01",
+      "question": "What is the primary goal of AI Document Assistant?",
+      "expectedChunkIndices": [0]
+    },
+    {
+      "id": "q02",
+      "question": "Which library is used to extract text from PDFs?",
+      "expectedChunkIndices": [0]
+    },
+    {
+      "id": "q03",
+      "question": "What chunk size and overlap does the chunking strategy use?",
+      "expectedChunkIndices": [1]
+    },
+    {
+      "id": "q04",
+      "question": "Why does the project use token-based chunking instead of a character heuristic?",
+      "expectedChunkIndices": [1]
+    },
+    {
+      "id": "q05",
+      "question": "Which embedding model is used and how many dimensions does it return?",
+      "expectedChunkIndices": [1]
+    },
+    {
+      "id": "q06",
+      "question": "What batch size is used for embedding requests?",
+      "expectedChunkIndices": [1]
+    },
+    {
+      "id": "q07",
+      "question": "Why does the VectorStore interface receive embeddings instead of raw text?",
+      "expectedChunkIndices": [2]
+    },
+    {
+      "id": "q08",
+      "question": "Which two storage backends implement the VectorStore interface?",
+      "expectedChunkIndices": [2]
+    },
+    {
+      "id": "q09",
+      "question": "Which retrieval techniques are listed as not currently implemented?",
+      "expectedChunkIndices": [2]
+    },
+    {
+      "id": "q10",
+      "question": "What does the model say when the answer is not in the retrieved context?",
+      "expectedChunkIndices": [2]
+    },
+    {
+      "id": "q11",
+      "question": "When is the chat cleared, and why?",
+      "expectedChunkIndices": [3]
+    },
+    {
+      "id": "q12",
+      "question": "What pricing assumptions are configured for embeddings and chat generation?",
+      "expectedChunkIndices": [3]
+    },
+    {
+      "id": "q13",
+      "question": "What metrics does the benchmark report?",
+      "expectedChunkIndices": [4]
+    },
+    {
+      "id": "q14",
+      "question": "What are the project's intentional non-goals?",
+      "expectedChunkIndices": [4]
+    },
+    {
+      "id": "q15",
+      "question": "What internationalization work is planned in the future?",
+      "expectedChunkIndices": [4]
+    }
+  ]
+}
