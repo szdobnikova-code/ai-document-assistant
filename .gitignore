@@ -46,3 +46,6 @@ docs/promts-raw.txt
 
 # playwright MCP session artifacts
 /.playwright-mcp/
+
+# JetBrains / IntelliJ
+/.idea/

@@ -3,17 +3,12 @@
 import { z } from 'zod';
 
 import { chunkText } from '@/lib/chunk/chunk-text';
-import { embedText } from '@/lib/embeddings/embed-text';
+import { embedTexts } from '@/lib/embeddings/embed-text';
 import { extractPdfText } from '@/lib/pdf/extract';
-import { vectorStore } from '@/lib/storage/store';
+import { documentStore } from '@/lib/storage/document-store';
 import type { ExtractedDocument, StoredChunk } from '@/types/document';
-import { upsertDocument } from '@/lib/storage/document-store';
 
 const fileSchema = z.file().mime('application/pdf');
-
-// Embed only the first few chunks for now — proves the embedding layer
-// end-to-end without retrieval and keeps per-upload token cost tiny.
-const EMBED_LIMIT = 3;
 
 export interface ChunkStats {
   chunksCount: number;
@@ -74,21 +69,19 @@ export async function uploadDocument(
     // empty response) must not drop the extraction + chunk stats above.
     let embeddingStats: EmbeddingStats | undefined;
     try {
-      const stored: StoredChunk[] = await Promise.all(
-        chunks.slice(0, EMBED_LIMIT).map(async (chunk) => ({
-          id: `${document.meta.id}-${chunk.index}`,
-          text: chunk.content,
-          embedding: await embedText(chunk.content), // throws if no embedding
-          meta: {
-            documentId: document.meta.id,
-            filename: document.meta.filename,
-            index: chunk.index,
-          },
-        })),
-      );
-      await vectorStore.reset();
-      await upsertDocument(document.meta);
-      await vectorStore.add(stored);
+      const embeddings = await embedTexts(chunks.map((c) => c.content));
+      const stored: StoredChunk[] = chunks.map((chunk, i) => ({
+        id: `${document.meta.id}-${chunk.index}`,
+        text: chunk.content,
+        embedding: embeddings[i],
+        tokenCount: chunk.tokenCount,
+        meta: {
+          documentId: document.meta.id,
+          filename: document.meta.filename,
+          index: chunk.index,
+        },
+      }));
+      await documentStore.replaceActive(document.meta, stored);
       const dims = stored[0]?.embedding?.length ?? 0;
       if (stored.length > 0 && dims > 0) {
         embeddingStats = {
