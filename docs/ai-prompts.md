@@ -180,13 +180,15 @@ Edge cases documented: re-uploading the same file clears chat (accepted); failed
 
 ## 6. Code review — catching infrastructure defects before they hit production
 
-**Context:** After implementing pgvector persistence, asked Claude to review the last 10 commits as a senior engineer. Not a style review — a production-readiness pass.
+**Context:** After implementing pgvector persistence, ran a structured code review using a custom code-review skill in Claude Code. Not a style review — a production-readiness pass.
 
 **Prompt:**
 
 ```
 review the current branch changes
 ```
+
+*(Run via the code-review skill, which framed the review as a production-readiness pass rather than a style check.)*
 
 **Outcome:** Four high-priority defects surfaced:
 
@@ -197,7 +199,7 @@ review the current branch changes
 
 All four fixed in a follow-up commit: pool singleton, `embedTexts(string[])` batch API replacing the capped loop, `.idea/` untracked, `clearDocuments()` added to enforce single-active-document semantics at the DB level.
 
-**Lesson:** A short "review the current branch changes" prompt with no scope constraints produced a more useful review than a checklist-style prompt would have. The reviewer framing — "what would block this from shipping" — surfaced the `EMBED_LIMIT` issue, which was the most impactful bug: the demo was technically working but returning "I couldn't find that" for most questions on any real document.
+**Lesson:** Using a dedicated code-review skill produced a more useful result than a generic prompt would have. The skill's production-readiness framing — "what would block this from shipping" — surfaced the `EMBED_LIMIT` issue, which was the most impactful bug: the demo was technically working but returning "I couldn't find that" for most questions on any real document. Having the right tool for the right task matters — a generic prompt and a skill-framed review are not the same thing.
 
 ---
 

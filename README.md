@@ -19,7 +19,7 @@ Built as a portfolio project to demonstrate end-to-end AI engineering — chunki
 - Drag-and-drop PDF upload → token-accurate chunking → batch embeddings → store → top-k retrieval → streamed cited answer.
 - Storage abstracted behind a `VectorStore<T>` interface — swap **MemoryStore** ↔ **PgVectorStore (Supabase + pgvector)** with one env flag, no code changes.
 - Live session-cost meter (tokens + USD) in the sidebar.
-- - Measured retrieval quality with a hand-annotated benchmark (Recall@1 66.7%, Recall@3 100%, Recall@5 100%).
+- Measured retrieval quality with a hand-annotated benchmark (Recall@1 66.7%, Recall@3 100%, Recall@5 100%).
 - Streaming chat via the Vercel AI SDK, with citations rendered as expandable source cards.
 
 ---
@@ -257,3 +257,11 @@ Reasonable next steps if the project ever grew:
 - `tests/api/usage.test.ts` — route shape.
 
 Not covered by unit tests (intentionally, given scope): UI components, server actions, full end-to-end retrieval-to-stream — the benchmark harness in `scripts/benchmark.ts` plays that role instead.
+
+---
+
+## AI workflow
+
+This project was built with Claude Code as the primary AI assistant.
+Prompting patterns, architectural decisions, and lessons learned are
+documented in [ai-prompts.md](ai-prompts.md).
