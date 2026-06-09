@@ -4,7 +4,7 @@ RAG-based PDF Q&A. Upload one PDF, ask questions, get streamed answers with cita
 
 Built as a portfolio project to demonstrate end-to-end AI engineering — chunking, embeddings, retrieval, streaming, citations, persistence, and **measured retrieval quality + cost** — over a deliberately small Next.js 16 surface.
 
-**Live demo:** https://ai-document-assistant-beta.vercel.app/
+**Live demo:** https://docassistant.vercel.app/
 
 ![Upload page (light)](docs/screenshots/upload-light.png)
 
