@@ -8,6 +8,8 @@ create table if not exists documents (
     created_at timestamptz not null default now()
 );
 
+alter table documents enable row level security;
+
 create table if not exists document_chunks (
     id text primary key,
     document_id uuid not null references documents(id) on delete cascade,
@@ -19,6 +21,8 @@ create table if not exists document_chunks (
     page integer,
     created_at timestamptz not null default now()
 );
+
+alter table document_chunks enable row level security;
 
 create index if not exists document_chunks_document_id_idx
     on document_chunks(document_id);
